@@ -19,7 +19,7 @@ class FeedbackTabs extends React.Component {
     {this.props.feedbackQuestions.length>0 && this.props.feedbackQuestions.forEach((item, index) => {
     tabArr.push(<Tab  heading={<TabHeading style={{ backgroundColor: defaultColor, height: 60 }}>
     <Text style={{ fontSize: 20, color: '#fff' }}>{this.props.feedbackQuestions[index].Category}</Text></TabHeading>}>
-    <Feedback navigation={this.props.navigation} isUserInfopage={this.props.feedbackQuestions[index].Category==="Customer Info"?true:false} 
+    <Feedback navigation={this.props.navigation} isUserInfopage={this.props.feedbackQuestions[index].CatID===0?true:false} 
     questionnaire={this.props.feedbackQuestions[index]}  lastpage={index+1===this.props.feedbackQuestions.length? true: false} />
     </Tab>)
     })}

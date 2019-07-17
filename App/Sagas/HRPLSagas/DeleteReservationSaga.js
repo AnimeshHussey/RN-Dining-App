@@ -6,10 +6,16 @@ export const deleteReservation = function * (action) {
     const  reservation  = action.res;
     // make the call to the api
   const response = yield call(cancelReservation, reservation, reservation.ID);
-  if (response==="CANCELLED") {
-    // do data conversion here if needed
-    yield put({type: ReduxActions.SUCCESSFULLY_DELETED_RESERVATIONS, response });
-  } else {
+
+  try {
+    if (response==="CANCELLED") {
+      // do data conversion here if needed
+      yield put({type: ReduxActions.SUCCESSFULLY_DELETED_RESERVATIONS, response });
+    } else {
+      yield put({type: ReduxActions.FAILED_TO_DELETE_RESERVATIONS});
+    }
+  } catch (error) {
     yield put({type: ReduxActions.FAILED_TO_DELETE_RESERVATIONS});
   }
+ 
 }

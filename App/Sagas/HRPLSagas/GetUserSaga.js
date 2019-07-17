@@ -7,6 +7,7 @@ export const getUser = function * (action) {
     const isResOpen= action.isResOpen;
   // make the call to the api
   const response = yield call(getCustomer,mobileNumber);
+ try {
   if (response!=="Mobile number is not registered !") {
     if(isResOpen){
       yield put({type: ReduxActions.SET_BOOKING_NAME, bookingName: response.CustomerName });
@@ -18,4 +19,7 @@ export const getUser = function * (action) {
   else {
     yield put({type: ReduxActions.FAILED_TO_GET_USER});
   }
+ } catch (error) {
+  yield put({type: ReduxActions.FAILED_TO_GET_USER});
+ }
 }

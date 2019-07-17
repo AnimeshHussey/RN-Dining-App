@@ -482,7 +482,7 @@ class SearchReservation extends Component {
             </ScrollView>
           </View>
           {this.props.isDel &&
-            <Modal backdropColor="black" backdropOpacity="0.4" transparent={true}
+            <Modal backdropColor="black" transparent={true}
               style={{
                 borderRadius: 5, opacity: 0.8,
                 alignContent: 'center', alignSelf: 'center', alignContent: 'center'

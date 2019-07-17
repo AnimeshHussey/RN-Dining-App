@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { ScrollView, Text, Alert, View, TouchableOpacity, TextInput, Image, Dimensions } from 'react-native'
-import { Card , Toast} from 'native-base';
+import { Card , Toast,DatePicker} from 'native-base';
 import { connect } from 'react-redux';
 import ReduxActions from "../../Redux/ActionTypes/Action";
 import SagaActions from "../../Sagas/ActionTypes/Action";
@@ -8,12 +8,31 @@ import Icon from 'react-native-vector-icons/Entypo';
 import { defaultColor, supportingColor } from '../Styles/CommonStyles';
 import Icon2 from 'react-native-vector-icons/MaterialIcons';
 import { NavigationActions } from 'react-navigation';
+import RatingComponent from '../../Components/Rating';
+import moment from "moment";
 class Feedback extends Component {
+
   onLayout(e) {
     const { width, height } = Dimensions.get('window');
     this.props.dispatch({ type: ReduxActions.SCREEN_WIDTH, width: width });
     this.props.dispatch({ type: ReduxActions.SCREEN_HEIGHT, height: height });
   }
+
+  _showDateTimePicker = () => 
+  {if(!this.props.isDateTimePickerVisible)
+  this.props.dispatch({type:ReduxActions.IS_RESRV_DATETIME_VISIBLE, isVisible: true })};
+
+  _hideDateTimePicker = () => {
+    if(this.props.isDateTimePickerVisible)
+    this.props.dispatch({type:ReduxActions.IS_RESRV_DATETIME_VISIBLE, isVisible: false })};
+
+  _handleDatePicked = (index,date) => {
+    var submittedTime = moment(new Date(date)).format('YYYY-MM-DD HH:mm:ss'+'.000Z');
+    this.props.dispatch({ type: ReduxActions.SET_DATE_TIME, dateTime:submittedTime });
+    this.setServiceFeedback(index, submittedTime);
+    this._hideDateTimePicker();
+  };
+
   getFontSize(size) {
     if ((this.props.height > 800 && this.props.width > 1200) || (this.props.width > 800 && this.props.height > 1200)) {
       if (this.props.width < this.props.height) {
@@ -29,12 +48,34 @@ class Feedback extends Component {
       }
     }
   }
+
+  componentDidUpdate(prevState,newState){
+    try {
+      if(prevState.isFeedbackSubmitted !== this.props.isFeedbackSubmitted && this.props.isFeedbackSubmitted){
+        const resetAction = NavigationActions.reset({
+          index: 0,
+          key: null,
+          actions: [
+          NavigationActions.navigate({routeName: "LoginScreen"})
+          ]
+          });
+          this.props.navigation.dispatch(resetAction);
+      }
+    } catch (error) {
+      this.props.dispatch({ type: ReduxActions.FAILED_TO_SET_FFEDBACK_QUESTIONS});
+    }
+  }
+
+  changeRating=(rating)=>{
+   this.props.dispatch({type:ReduxActions.SET_FEEDBACK_RATING,Rating:rating});
+  }
+
   render() {
     let QuestionCards = [];
     this.props.questionnaire.Questions.map((element, index) => {
       QuestionCards.push(
         <Card key={index} style={{
-          width: 99 + '%', backgroundColor: '#fff', height: Math.min(this.props.width, this.props.height) / 4, margin: 10,
+          width: 99 + '%', backgroundColor: '#fff', height: Math.min(this.props.width, this.props.height) / 6, margin: 10,
           borderWidth: 0.3, flexDirection: 'column', padding: 5, opacity: 1, zIndex: 15
         }}>
           <View style={{ flexDirection: 'column', marginBottom: 10, justifyContent: 'center', alignItems: 'center' }}>
@@ -44,7 +85,7 @@ class Feedback extends Component {
             }}>
               <Text style={{ color: 'black', fontSize: (this.props.width* this.props.height)*0.00004, fontWeight: 'bold' }}>{element.Question}</Text>
             </View>}
-           {!this.props.isUserInfopage && <View style={{ flexDirection: 'row' }}>
+          {!this.props.isUserInfopage && <View style={{ flexDirection: 'row' }}>
               <TouchableOpacity style={{
                 justifyContent: 'flex-end', alignSelf: 'flex-start',
                 marginLeft: -20, marginTop: -25, width: 55
@@ -52,57 +93,29 @@ class Feedback extends Component {
               </TouchableOpacity>
               <View style={{
                 width: 70 + '%', height: Math.min(this.props.width, this.props.height) / 8, flexDirection: 'row', justifyContent: 'space-evenly', alignContent: 'center',
-                alignItems: 'center', alignSelf: 'center', backgroundColor: supportingColor
-              }}>
-
+                alignItems: 'center', alignSelf: 'center'}}>
+              {element.AnswerOptions && element.AnswerOptions.map((each,qstnIndex)=>{
+                return(
                 <TouchableOpacity style={{
-                  width: 30 + '%', height: Math.min(this.props.width, this.props.height) / 11, flexDirection: 'row',
-                  backgroundColor: element.Answer === '1' ? '#fff' : defaultColor,
+                  width:`${element.AnswerOptions.length===2?'20%':'30'}`, height: Math.min(this.props.width, this.props.height) / 11, flexDirection: 'row',
+                  backgroundColor: element.Answer === each ? '#fff' : defaultColor,
                   alignItems: 'center', justifyContent: 'center', borderRadius: 10, padding: 5,
-                  opacity: element.Answer === 1 ? 0.8 : 1
-                }}
-                  //  disabled={true}
-                  onPress={this.setServiceFeedback.bind(this, index, '1')}
-                >
-                  <Icon2 name="sentiment-dissatisfied" style={{
-                    fontSize: (this.props.width* this.props.height)*0.000030,
-                    //  color: 'red'
-                    color: '#fff',
-                    backgroundColor: 'red',
-                    borderRadius: 30, marginRight: 3
-                  }}></Icon2>
-                  <Text style={{ color: element.Answer === '1' ? defaultColor : '#fff', fontSize: (this.props.width* this.props.height)*0.000025, fontWeight: 'bold' }}>Dissatisfied</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={{
-                  width: 30 + '%', height: Math.min(this.props.width, this.props.height) / 11, flexDirection: 'row',
-                  backgroundColor: element.Answer === '2' ? '#fff' : defaultColor,
-                  alignItems: 'center', justifyContent: 'center', borderRadius: 10, padding: 5,
-                  opacity: element.Answer === '2' ? 0.8 : 1
-                }}
-                  //  disabled={true}
-                  onPress={this.setServiceFeedback.bind(this, index, '2')}
-                >
-                  <Icon2 name="sentiment-neutral" style={{
-                    fontSize: (this.props.width* this.props.height)*0.00003,
-                    //  color: 'orange'
-                    color: '#fff',
-                    backgroundColor: 'orange',
-                    borderRadius: 30, marginRight: 3
-                  }}></Icon2>
-                  <Text style={{ color: element.Answer === '2' ? defaultColor : '#fff', fontSize: (this.props.width* this.props.height)*0.000025, fontWeight: 'bold' }}>Neutral</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={{
-                  width: 30 + '%', height: Math.min(this.props.width, this.props.height) / 11, flexDirection: 'row',
-                  backgroundColor: element.Answer === '3' ? '#fff' : defaultColor,
-                  alignItems: 'center', justifyContent: 'center', borderRadius: 10, padding: 5,
-                  opacity: element.Answer === '3' ? 0.8 : 1
-                }}
-                  onPress={this.setServiceFeedback.bind(this, index, '3')}>
-                  <Icon2 name="sentiment-satisfied" style={{ fontSize: (this.props.width* this.props.height)*0.00003, color: '#fff', backgroundColor: 'green', borderRadius: 30, marginRight: 3 }}></Icon2>
-                  <Text style={{ color: element.Answer === '3' ? defaultColor : '#fff', fontSize: (this.props.width* this.props.height)*0.000025, fontWeight: 'bold' }}>Satisfied</Text>
-                </TouchableOpacity>
+                  opacity: element.Answer === each ? 0.8 : 1
+                }}onPress={this.setServiceFeedback.bind(this, index, each)}>
+                  <Icon2 name={qstnIndex===0?"sentiment-dissatisfied":"sentiment-satisfied"}
+                  style={{ fontSize: (this.props.width* this.props.height)*0.00006,
+                  color: '#fff', backgroundColor:`${qstnIndex===0?"red":"green"}`, borderRadius: 30, marginRight: 3 }}></Icon2>
+                <Text style={{ color: element.Answer === each ? defaultColor : '#fff', fontSize: (this.props.width* this.props.height)*0.000025, fontWeight: 'bold' }}>{each}</Text>
+                </TouchableOpacity>)})}
+                {!element.AnswerOptions && <View style={{ width: 75 + '%', flexDirection: "row", justifyContent: "center" }}>
+                <View style={{ width: 75 + '%' }}>
+                  <TextInput underlineColorAndroid='transparent'style={{ height: this.getFontSize(60), borderColor: 'black', borderWidth: 0.5, paddingBottom: 2,
+                     paddingTop: 2, fontSize: this.getFontSize(35), backgroundColor: '#fff', color: 'black',opacity: 1, justifyContent: 'center' }} 
+                     onChangeText={(text) => this.setServiceFeedback(index, text)} value={element.Answer} />
+                </View>
+            </View>}
               </View>
-              <TouchableOpacity style={{ justifyContent: 'flex-end', alignSelf: 'flex-start', marginLeft: -20, marginTop: -25, width: 55 }}
+              <TouchableOpacity style={{ justifyContent: 'flex-end', alignSelf: 'flex-start', width: 55 }}
                 onPress={this.setServiceFeedback.bind(this, index, null)}
               >
                 {element.Answer !== null && <Icon name="circle-with-cross" style={{ color: 'black', fontSize: (this.props.width* this.props.height)*0.000055}}></Icon>}
@@ -115,16 +128,45 @@ class Feedback extends Component {
               {element.Question}
               </Text>
             </View>
+            </View>
             <View style={{ width: 50 + '%', flexDirection: "column" }}>
-                <View style={{ width: 80 + '%' }}>
+            {(element.AnswerOptions===null && element.QuestionID!==3) &&
+              <View style={{ width: 80 + '%' }}>
                   <TextInput underlineColorAndroid='transparent'style={{ height: this.getFontSize(40), borderColor: 'black', borderWidth: 0.5, paddingBottom: 2,
                      paddingTop: 2, fontSize: this.getFontSize(25), backgroundColor: '#fff', color: 'black',opacity: 1  }} 
-                     onChangeText={(text) => this.textValidation(text,element.Question)} value={element.QuestionID===1?this.props.feedbackUserName:this.props.feedbackUserNumber} />
-                </View>
+                     onChangeText={(text) => this.textValidation(text,element.QuestionID)} 
+                     value={element.QuestionID===1?this.props.feedbackUserName:this.props.feedbackUserNumber} />
+                </View>}
+            {(element.QuestionID===3 && element.AnswerOptions===null) && 
+              <View style={{ width: 80 + '%' }}>
+              <RatingComponent changedRating={this.changeRating.bind(this)} starCount={this.props.feedbackRating}/>
+              </View>}
+            {(element.AnswerOptions!==null && Array.isArray(element.AnswerOptions)) &&
+              <View style={{ width: 80 + '%' }}>
+                <TouchableOpacity itemColor={defaultColor} 
+                      onPress={this._showDateTimePicker.bind(this)}
+                        style={{
+                          height: 40, borderColor: 'black', borderWidth: 0.5, backgroundColor: '#fff',
+                          opacity: 1, fontSize: 25, paddingBottom: 5
+                        }} >
+                          <DatePicker
+                        defaultDate={new Date(new Date().getFullYear()-18, new Date().getMonth-1, new Date().getDay())}
+                        maximumDate={new Date()}
+                        locale={"en"}
+                        timeZoneOffsetInMinutes={undefined}
+                        modalTransparent={false}
+                        animationType={"fade"}
+                        androidMode={"default"}
+                        placeHolderText="Select DOB"
+                        textStyle={{ color: "green" }}
+                        placeHolderTextStyle={{ color: "#d3d3d3" }}
+                        onDateChange={this._handleDatePicked.bind(this,index)}
+                        disabled={false}
+                        />
+                      </TouchableOpacity>
+                </View>}
             </View>
-            </View>
-          </View>}
-          
+            </View>}
           </View>
         </Card>)
     })
@@ -157,31 +199,25 @@ class Feedback extends Component {
     )
   }
   
-  Submit() {
+  Submit() {    
     if(this.props.connectionStatus==='Online'){
-      if(this.props.feedbackUserNumber.length === 10 && /^[0-9]{1,10}$/.test(this.props.feedbackUserNumber) && this.props.feedbackUserName.trim()!==''){ 
+      if(parseFloat(this.props.feedbackRating,10)<=10 && parseFloat(this.props.feedbackRating,10)>=1){
+      if(this.props.feedbackUserNumber.length === 10 && /^[0-9]{1,10}$/.test(this.props.feedbackUserNumber.trim()) && this.props.feedbackUserName.trim()!==''){ 
       let answers=[...this.props.feedbackQuestions];
       answers.forEach(element => {
-       if(element.Category==="Customer Info"){
+       if(element.CatID===0){
           element.Questions.forEach(item => {
-          if(item.Question.toLowerCase().includes("mobile"))
-            item.Answer= this.props.feedbackUserNumber;
-          else
-            item.Answer= this.props.feedbackUserName;
+          if(item.QuestionID === 1) item.Answer = this.props.feedbackUserName.trim();
+          else if(item.QuestionID === 2) item.Answer = this.props.feedbackUserNumber.trim();
+          else if(item.QuestionID === 3) item.Answer = this.props.feedbackRating;
+          else item.Answer = this.props.dateTime;
         })
        }
       });
       this.props.dispatch({ type: SagaActions.SET_FEEDBACK_QUESANS, feed: answers,  orderID: this.props.FeedbackOrderID });
       this.props.dispatch({ type: ReduxActions.SETADMIN_PASSWORD, adminPassword: "" });
       this.props.dispatch({type:ReduxActions.RESET_LOGIN_SUCCESSFULLY});
-      const resetAction = NavigationActions.reset({
-        index: 0,
-        key: null,
-        actions: [
-        NavigationActions.navigate({routeName: "LoginScreen"})
-        ]
-        });
-        this.props.navigation.dispatch(resetAction);
+      this.props.dispatch({type:ReduxActions.RESET_FEEDBACK_REDUCER});
     } 
     else {
       Toast.show({
@@ -194,6 +230,18 @@ class Feedback extends Component {
       })
     }
   }
+  else{
+    Toast.show({
+      text: 'Ratings can only be between 1 and 10',
+      textStyle: { fontSize: 25, fontFamily:'Avenir-Black',fontWeight:'bold' },
+      duration: 3000,
+      buttonTextStyle:{fontSize: 20, fontFamily:'Avenir-Black'},
+      buttonText: "Okay",
+      type: "danger"
+    })
+  }
+}
+
   else {
     Toast.show({
       text: 'You are offline. Please check internet connection.',
@@ -226,12 +274,12 @@ class Feedback extends Component {
     });
     this.props.dispatch({ type: ReduxActions.SET_FEEDBACK_QUESTIONS, response: finalArr });
   }
-  textValidation(inputtxt,question){
-    if(question.toLowerCase().includes("mobile"))
-    this.props.dispatch({ type: ReduxActions.SET_FEEDBACK_USER_NUMBER,  number: inputtxt });
-    else      
-    this.props.dispatch({ type: ReduxActions.SET_FEEDBACK_USER_NAME,  name: inputtxt});
-
+  textValidation(inputtxt,questionID){
+    // if(question.toLowerCase().includes("mobile"))
+    if(questionID===1)this.props.dispatch({ type: ReduxActions.SET_FEEDBACK_USER_NAME,  name: inputtxt});
+    
+    else if(questionID===2)this.props.dispatch({ type: ReduxActions.SET_FEEDBACK_USER_NUMBER,  number: inputtxt });
+    else this.props.dispatch({ type: ReduxActions.SET_FEEDBACK_RATING,  rating: inputtxt});
     // if(inputtxt.length === 10 && /^[0-9]{1,10}$/.test(inputtxt)){
     // }
   }
@@ -239,14 +287,18 @@ class Feedback extends Component {
 
 const mapStateToProps = (state) => {
   return {
-    // serviceFeedback: state.FeedbackReducer.serviceFeedback,
+    serviceFeedback: state.FeedbackReducer.serviceFeedback,
     feedbackQuestions: state.FeedbackReducer.FeedbackQuestions,
     FeedbackOrderID: state.FeedbackReducer.FeedbackOrderID,
     feedbackUserNumber:state.FeedbackReducer.feedbackUserNumber,
     feedbackUserName:state.FeedbackReducer.feedbackUserName,
     height: state.DashBoardReducer.height,
     width: state.DashBoardReducer.width,
-    connectionStatus: state.loginReducer.connectionStatus
+    connectionStatus: state.loginReducer.connectionStatus,
+    isDateTimePickerVisible:state.ReservationReducer.isDateTimePickerVisible,
+    dateTime: state.ReservationReducer.dateTime,
+    feedbackRating:state.FeedbackReducer.feedbackRating,
+    isFeedbackSubmitted:state.FeedbackReducer.isFeedbackSubmitted
   };
 }
 

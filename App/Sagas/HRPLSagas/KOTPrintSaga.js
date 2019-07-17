@@ -6,10 +6,14 @@ export const doKOTPrinting = function * (action) {
   // make the call to the api
   const  KOTObj  = action.KOTObj;
   const response = yield call(KOTPrinting,KOTObj);
-  if (response==="Sucessfully Printed") {
-    // do data conversion here if needed
-    yield put({type: ReduxActions.SUCCESSFULLY_PRINT_KOT, response });
-  } else {
+  try {
+    if (response==="Sucessfully Printed") {
+      // do data conversion here if needed
+      yield put({type: ReduxActions.SUCCESSFULLY_PRINT_KOT, response });
+    } else {
+      yield put({type: ReduxActions.FAILED_TO_PRINT_KOT});
+    }
+  } catch (error) {
     yield put({type: ReduxActions.FAILED_TO_PRINT_KOT});
-  }
+  }  
 }

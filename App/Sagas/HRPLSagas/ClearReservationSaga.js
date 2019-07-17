@@ -8,10 +8,15 @@ export const clearAllReservation = function * (action) {
   // make the call to the api
   const response = yield call(clearReservations, idArray);
   
-  if (response==="CLEARED") {
-    // do data conversion here if needed
-    yield put({type: ReduxActions.SUCCESSFULLY_CLEARED_RESERVATIONS, response});
-  } else {
+  try {
+    if (response==="CLEARED") {
+      // do data conversion here if needed
+      yield put({type: ReduxActions.SUCCESSFULLY_CLEARED_RESERVATIONS, response});
+    } else {
+      yield put({type: ReduxActions.FAILED_TO_CLEAR_RESERVATIONS, response});
+    }
+  } catch (error) {
     yield put({type: ReduxActions.FAILED_TO_CLEAR_RESERVATIONS, response});
   }
+  
 }

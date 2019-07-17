@@ -6,6 +6,7 @@ export const fetchTableStatus = function * (action) {
     const tableID=action.tableID;
     // make the call to the api
     const response = yield call(getTableStatus,tableID);        
+  try {
     if (response==="" ||response==="PLACED" ||response==="CHECKEDOUT" ||response=== "INVOICED") {
       // do data conversion here if needed
       yield put(
@@ -14,4 +15,7 @@ export const fetchTableStatus = function * (action) {
     } else {
       yield put({type: ReduxActions.FAILED_TO_GET_TABLE_STATUS});
     }
+  } catch (error) {
+    yield put({type: ReduxActions.FAILED_TO_GET_TABLE_STATUS});
+  }
   }

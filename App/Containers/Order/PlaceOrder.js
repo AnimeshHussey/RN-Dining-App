@@ -51,6 +51,13 @@ class PlaceOrder extends Component {
         });
       }
     }   
+
+    componentDidCatch(error, info) {
+      // Display fallback UI
+      //this.setState({ hasError: true });
+      // You can also log the error to an error reporting service
+      alert("Detectd");
+    }
   render() {
     return (
       <Card onLayout={this.onLayout.bind(this)}>
@@ -91,7 +98,7 @@ class PlaceOrder extends Component {
                         <TouchableOpacity onPress={() => this.updateIndex(element, false, index)} style={{ padding: 10 }}>
                           <Icon name="minus-circle" size={this.getFontSize(40)} color={plusMinusIconColor} />
                         </TouchableOpacity>
-                          <Text style={{ marginVertical: 18, fontSize: this.props.width>this.props.height?this.getFontSize(20): this.getFontSize(15), color: defaultTxtColor }}>{element.quantity}</Text>
+                          <Text style={{ marginVertical: 18, fontSize: this.props.width>this.props.height?this.getFontSize(25): this.getFontSize(20),fontWeight:'bold',color: defaultTxtColor }}>{element.quantity}</Text>
                         <TouchableOpacity onPress={() => this.updateIndex(element, true, index)} style={{ padding: 10}}>
                           <Icon name="plus-circle" size={this.getFontSize(40)} color={plusMinusIconColor} />
                         </TouchableOpacity>
@@ -150,18 +157,16 @@ class PlaceOrder extends Component {
     this.props.dispatch({ type: ReduxActions.CHANGE_QUANTITY_FROM_MODAL, itemDetails: item, toAdd: add, itemIndex: ind });
   }
   submitOrder() {
+    try {
     if(this.props.connectionStatus==='Online'){
-       this.props.itemList.forEach((element) => {
-      element.Items.forEach(item => {
-          item.quantity=0;
-      })
-  });
+
   if(this.props.Orders.length!==0){
-    this.props.dispatch({type:ReduxActions.PLACING_ORDER});
     this.props.dispatch({ type: ReduxActions.IS_ORDER_MODAL_OPEN, isOrderModalOpen: false });
     let checkQuantity=[];
     checkQuantity=this.props.Orders.filter(item=>item.quantity===0)
     if(checkQuantity.length !== this.props.Orders.length){
+      
+      this.props.dispatch({type:ReduxActions.PLACING_ORDER});
       let tempOrder=Object.assign({},this.props.orderObj);
       tempOrder.customer=this.props.customer;
       tempOrder.tableID= this.props.selectedtable.TableID?this.props.selectedtable.TableID:this.props.masterTableID;
@@ -194,7 +199,6 @@ class PlaceOrder extends Component {
       if(!this.props.isResOpen){
         this.props.dispatch({type:ReduxActions.RESET_USER_REDUCER});
       }
- 
     }
       else{
         Toast.show({
@@ -228,7 +232,11 @@ class PlaceOrder extends Component {
       type: "danger"
     })
   }
+} catch (error) {
+  this.props.dispatch({type:ReduxActions.FAILED_TO_PLACE_ORDER});       
 }
+}
+
 }
 
 const mapStateToProps = (state) => {

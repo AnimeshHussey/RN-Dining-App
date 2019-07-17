@@ -6,10 +6,14 @@ export const saveReservation = function * (action) {
   const newReservation = action.objReservation;
   // make the call to the api
   const response = yield call(reserveTable, newReservation);
-  if (/^\d+$/.test(response)) {
-    // do data conversion here if needed
-    yield put({type: ReduxActions.RESERVATION_DETAILS_SAVED, response });
-  } else {
+  try {
+    if (/^\d+$/.test(response)) {
+      // do data conversion here if needed
+      yield put({type: ReduxActions.RESERVATION_DETAILS_SAVED, response });
+    } else {
+      yield put({type: ReduxActions.FAILED_TO_SET_RESERVATION_DETAILS});
+    }
+  } catch (error) {
     yield put({type: ReduxActions.FAILED_TO_SET_RESERVATION_DETAILS});
   }
 }

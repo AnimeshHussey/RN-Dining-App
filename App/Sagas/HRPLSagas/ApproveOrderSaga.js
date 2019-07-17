@@ -8,10 +8,14 @@ export const approveOrderSaga = function * (action) {
   // make the call to the api
   const response = yield call(approveOrder, OrderObj);
   
-  if (typeof response==='object' && response.isroundApproved===true) {
-    // do data conversion here if needed 
-    yield put({type: ReduxActions.SUCCESSFULLY_APPROVED_ORDER});
-  } else {
+  try {
+    if (typeof response==='object' && response.isroundApproved===true) {
+      // do data conversion here if needed 
+      yield put({type: ReduxActions.SUCCESSFULLY_APPROVED_ORDER});
+    } else {
+      yield put({type: ReduxActions.FAILED_TO_APPROVE_ORDER});
+    }
+  } catch (error) {
     yield put({type: ReduxActions.FAILED_TO_APPROVE_ORDER});
   }
 }

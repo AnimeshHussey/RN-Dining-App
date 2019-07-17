@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Text, TouchableOpacity, View, StyleSheet, ActivityIndicator } from 'react-native';
 import { connect } from 'react-redux';
 import Styles from '../Styles/LaunchScreenStyles';
-import { Container, Content } from "native-base";
+import { Container, Content,Toast } from "native-base";
 import TextBoxMaterial from "../../Components/TextBox";
 import ReduxActions from "../../Redux/ActionTypes/Action";
 import SagaActions from "../../Sagas/ActionTypes/Action";
@@ -10,7 +10,6 @@ import comStyles from '../Styles/CommonStyles';
 import sha256 from 'crypto-js/sha256';
 import hmacSHA512  from 'crypto-js/hmac-sha512';
 import Base64 from 'crypto-js/enc-base64';
-import {Toast } from 'native-base';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import {defaultColor} from '../Styles/CommonStyles';
 import * as Keychain from 'react-native-keychain';
@@ -18,7 +17,6 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { NavigationActions } from 'react-navigation';
 
 class LoginPageComponent extends Component {
-   
     changeField(changedText, type) {
         if (type === "userid") {
             this.props.dispatch({ type: ReduxActions.SETADMIN_USERID, userID: changedText });
@@ -37,7 +35,8 @@ class LoginPageComponent extends Component {
         await Keychain.resetGenericPassword();
     }
     onButtonPress() {
-        if(this.props.userID.split("#")[0] && this.props.adminPassword)
+        try {
+            if(this.props.userID.split("#")[0] && this.props.adminPassword)
         {
             if(this.props.adminPassword.length> 7){
             this.props.dispatch({type: ReduxActions.SET_LOGIN_PROGRESSBAR}) 
@@ -67,6 +66,10 @@ class LoginPageComponent extends Component {
                 type: "danger"
             });
         }
+        } catch (error) {
+            
+        }
+        
     }
     componentDidUpdate(){
         if (this.props.loginSuccessfully){
@@ -95,7 +98,9 @@ class LoginPageComponent extends Component {
         this.props.dispatch({type:ReduxActions.SET_REMEMBER_ME,isChecked:true})
     }
 
-    
+    componentWillUnmount(){
+        this.props.dispatch({type:ReduxActions.RESET_LOGIN_SPINNER});
+    }
     
     render() {
         return (

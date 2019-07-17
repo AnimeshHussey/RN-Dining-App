@@ -1,7 +1,6 @@
 import Immutable from 'seamless-immutable';
 import ReduxActions from "../ActionTypes/Action";
 import {Toast } from 'native-base';
-import { reducer } from '../GithubRedux';
 
 const INITIAL_STATE = Immutable({
     //CheckOrderDetails:{},
@@ -16,10 +15,21 @@ export const checkOutReducer = (state = INITIAL_STATE, action) => {
     // case ReduxActions.SET_CHECKOUT_ORDER_DETAILS:
     // return Object.assign({},state,{CheckOrderDetails:action.CheckoutorderDetails});
     
-    case ReduxActions.SUCCESSFULLY_G0T_CHECKOUT_ORDER_DETAILS:
+    case ReduxActions.SUCCESSFULLY_GOT_CHECKOUT_ORDER_DETAILS:
     return Object.assign({},state,{CheckoutOrderDetails:action.response});
 
-    case ReduxActions.FAILED_TO_GET_CHECKOUT_ORDER_DETAILS:
+    case ReduxActions.FAILED_TO_GET_CHECKOUT_ORDER_DETAILS:   
+    return Object.assign({},state);
+
+    case ReduxActions.FAILED_TO_CHECKEDOUT_ORDER:   
+    Toast.show({
+        text: "Unable to connect your network. Please check your connection and try again.",
+        textStyle: { fontSize: 25, fontFamily: 'Avenir-Black', fontWeight: 'bold' },
+        duration: 3000,
+        buttonTextStyle: { fontSize: 15, fontFamily: 'Avenir-Black' },
+        buttonText: "Okay",
+        type: "danger"
+      });
     return Object.assign({},state);
 
     case ReduxActions.SUCCESSFULLY_CHECKEDOUT_ORDER:

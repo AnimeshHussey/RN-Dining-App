@@ -5,10 +5,14 @@ import ReduxActions from "../../Redux/ActionTypes/Action";
 export const getAllItemsDetails = function * (action) {
     // make the call to the api
     const response = yield call(getAllItems,action.Pricegroup);
-    if (response) {
-      // do data conversion here if needed
-      yield put({type: ReduxActions.GOT_ALL_ITEMS, response });
-    } else {
+    try {
+      if (response) {
+        // do data conversion here if needed
+        yield put({type: ReduxActions.GOT_ALL_ITEMS, response });
+      } else {
+        yield put({type: ReduxActions.FAILED_TO_GET_ITEMS});
+      }
+    } catch (error) {
       yield put({type: ReduxActions.FAILED_TO_GET_ITEMS});
     }
   }

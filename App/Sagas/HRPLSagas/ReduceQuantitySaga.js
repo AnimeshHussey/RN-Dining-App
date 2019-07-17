@@ -6,11 +6,15 @@ export const reduceQuantity = function * (action) {
     const itemObj=action.obj;
     // make the call to the api
     const response = yield call(ReduceItemQuantity,itemObj);
-    if (typeof response!== 'object') {
-      // do data conversion here if needed
-      yield put({type: ReduxActions.SUCCESSFULLY_CHANGED_QUANTITY, response });
-    } 
-    else {
+    try {
+      if (typeof response!== 'object') {
+        // do data conversion here if needed
+        yield put({type: ReduxActions.SUCCESSFULLY_CHANGED_QUANTITY, response });
+      } 
+      else {
+        yield put({type: ReduxActions.FAILED_CHANGED_QUANTITY});
+      }
+    } catch (error) {
       yield put({type: ReduxActions.FAILED_CHANGED_QUANTITY});
     }
   }

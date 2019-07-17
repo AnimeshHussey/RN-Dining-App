@@ -8,10 +8,14 @@ export const UnblockTables = function * (action) {
     // make the call to the api
     const response = yield call(unblockTables, tableIds);
     
-    if (response === "Successfully booked the table.") {
-      // do data conversion here if needed
-      yield put({type: ReduxActions.SUCCESSFULLY_UNBLOCK_TABLES, response });
-    } else {
+    try {
+      if (response === "Successfully booked the table.") {
+        // do data conversion here if needed
+        yield put({type: ReduxActions.SUCCESSFULLY_UNBLOCK_TABLES, response });
+      } else {
+        yield put({type: ReduxActions.FAILED_TO_UNBLOCK_TABLES});
+      }
+    } catch (error) {
       yield put({type: ReduxActions.FAILED_TO_UNBLOCK_TABLES});
     }
   }

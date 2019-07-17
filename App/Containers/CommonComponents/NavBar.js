@@ -147,9 +147,17 @@ class NavBar extends Component {
     }
     unblockTables=()=>{
         if(!__.isEmpty(this.props.childTables)){
-            let tables = [...this.props.childTables];
-            tables.push(this.props.selectedtable.TableID);
-            this.props.dispatch({ type: SagaActions.UNBLOCK_TABLES, TableIds:tables });
+            if(this.props.orderNumber){
+                this.props.dispatch({ type: SagaActions.UNBLOCK_TABLE, id:this.props.selectedtable.TableID });       
+              }
+              else{
+                let tables = [...this.props.childTables];
+                tables.push(this.props.selectedtable.TableID);
+                this.props.dispatch({ type: SagaActions.UNBLOCK_TABLES, TableIds:tables });
+              }
+            // let tables = [...this.props.childTables];
+            // tables.push(this.props.selectedtable.TableID);
+            // this.props.dispatch({ type: SagaActions.UNBLOCK_TABLES, TableIds:tables });
         }
         else{
             this.props.dispatch({ type: SagaActions.UNBLOCK_TABLE, id:this.props.selectedtable.TableID });

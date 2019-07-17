@@ -1,7 +1,6 @@
 import Immutable from 'seamless-immutable';
 import ReduxActions from "../ActionTypes/Action";
 import {Toast } from 'native-base';
-
 const INITIAL_STATE = Immutable({   
     captainDetails:{
         USERNAME:'',
@@ -58,13 +57,16 @@ export const loginReducer = (state = INITIAL_STATE, action) => {
 
         case ReduxActions.FAILED_TO_LOGIN:
         Toast.show({
-            text: 'Please check saved ip & port./ Invalid Username and/or Password',
+            text: 'Please check saved ip & port / Invalid Username and/or Password',
             textStyle: { fontSize: 25, fontFamily:'Avenir-Black',fontWeight:'bold' },
             duration: 3000,
             buttonTextStyle:{fontSize: 20, fontFamily:'Avenir-Black'},
             buttonText: "Okay",
             type: "danger"
         })
+        return Object.assign({},state,{loginSuccessfully:false,isLoginPressed:false});
+
+        case ReduxActions.RESET_LOGIN_SPINNER:
         return Object.assign({},state,{loginSuccessfully:false,isLoginPressed:false});
 
         case ReduxActions.SUCCESSFULLY_REGISTERED:
@@ -96,12 +98,18 @@ export const loginReducer = (state = INITIAL_STATE, action) => {
         case ReduxActions.FAILED_TO_REGISTER:
         let captain =  Object.assign({}, INITIAL_STATE.captainDetails);
         let msg="";
+        if(action.response)
+        {
         if(action.response.Message==="Please provide a valid User name !"){
             msg="Please provide a valid name !"
         }
         else{
             msg='Failed to register. Please check saved ip & port.'
         }
+       }
+       else{
+        msg='Failed to register. Please check network Connection.'
+       }
         Toast.show({
             text: msg,
             textStyle: { fontSize: 25, fontFamily:'Avenir-Black',fontWeight:'bold' },

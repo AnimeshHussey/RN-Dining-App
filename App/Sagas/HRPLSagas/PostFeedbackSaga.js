@@ -9,10 +9,15 @@ export const postFeedbackSaga = function * (action) {
   // make the call to the api
   const response = yield call(postFeedbackQuesAns, mqs, orderID);
   //  ==='inserted'
-  if (response  ==='inserted') {
-    // do data conversion here if needed
-    yield put({type: ReduxActions.SUCCESSFULLY_SET_FFEDBACK_QUESTIONS});
-  } else {
+
+  try {
+    if (response  ==='inserted') {
+      // do data conversion here if needed
+      yield put({type: ReduxActions.SUCCESSFULLY_SET_FFEDBACK_QUESTIONS});
+    } else {
+      yield put({type: ReduxActions.FAILED_TO_SET_FFEDBACK_QUESTIONS});
+    }
+  } catch (error) {
     yield put({type: ReduxActions.FAILED_TO_SET_FFEDBACK_QUESTIONS});
-  }
+  } 
 }

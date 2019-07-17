@@ -45,12 +45,14 @@ class CheckoutOrderScreen extends React.Component {
     }
 
     checkoutOrder() { 
+       try {
         if(this.props.connectionStatus==='Online'){
             if(this.props.orderNumber)
             {
                 this.props.dispatch({type:ReduxActions.HIDE_CHECKOUT_MODAL});
                 let checkoutObj={...this.props.CheckOrderDetails}; 
                     checkoutObj.finalCheckout= true;
+                    checkoutObj.PriceGroup=this.props.selectedSection.m_Item3;
               this.props.dispatch({type:SagaActions.CHECKOUT_ORDER,Obj:checkoutObj});              
             }
         } else {
@@ -63,6 +65,8 @@ class CheckoutOrderScreen extends React.Component {
             type: "danger"
           })
         }
+       } catch (error) {
+       }
         
     }
 
@@ -73,11 +77,16 @@ class CheckoutOrderScreen extends React.Component {
         }
     }
     componentDidUpdate(prevProps, prevState){
-        if(this.props.IsorderCheckedOut){
+        if(prevProps.IsorderCheckedOut !== this.props.IsorderCheckedOut && this.props.IsorderCheckedOut){
         if(!__.isEmpty(this.props.childTables)){
-            let tables = [...this.props.childTables];
-            tables.push(this.props.selectedtable.TableID);
-            this.props.dispatch({ type: SagaActions.UNBLOCK_TABLES, TableIds:tables });
+            if(this.props.orderNumber){
+                this.props.dispatch({ type: SagaActions.UNBLOCK_TABLE, id:this.props.selectedtable.TableID });       
+              }
+              else{
+                let tables = [...this.props.childTables];
+                tables.push(this.props.selectedtable.TableID);
+                this.props.dispatch({ type: SagaActions.UNBLOCK_TABLES, TableIds:tables });
+              }
         }
         else{
             this.props.dispatch({ type: SagaActions.UNBLOCK_TABLE, id:this.props.selectedtable.TableID });
@@ -246,7 +255,7 @@ class CheckoutOrderScreen extends React.Component {
             <NavBar navigation={this.props.navigation}/>
           </View>
           {this.props.showCheckoutModal &&
-                  <Modal backdropColor="black" backdropOpacity="0.4" transparent={true} style={{
+                  <Modal backdropColor="black" transparent={true} style={{
                     borderRadius: this.getFontSize(5), opacity: 0.8,
                     alignContent: 'center', alignSelf: 'center', alignContent: 'center'
                   }} visible={this.props.isUserModalVisible}

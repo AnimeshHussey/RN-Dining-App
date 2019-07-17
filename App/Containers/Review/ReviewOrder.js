@@ -176,7 +176,7 @@ class ReviewOrderScreen extends React.Component {
                     <NavBar navigation={this.props.navigation} />
                 </View>
                 {this.props.swap && 
-                <Modal backdropColor="black" backdropOpacity="0.4" transparent={true} 
+                <Modal backdropColor="black" transparent={true} 
                 style={{ borderRadius: 5, opacity: 0.8,
                 alignContent: 'center', alignSelf: 'center', alignContent: 'center'}}
                 visible={this.props.swap} onBackdropPress={this.activateSwap.bind(this,"")}
@@ -184,7 +184,7 @@ class ReviewOrderScreen extends React.Component {
                 >
                 <SwapModal></SwapModal>
                 </Modal>}
-                {this.props.showQuantityModal && <Modal backdropColor="black" backdropOpacity="0.4" transparent={true} 
+                {this.props.showQuantityModal && <Modal backdropColor="black" transparent={true} 
                 style={{ borderRadius: 5, opacity: 0.8,
                 alignContent: 'center', alignSelf: 'center', alignContent: 'center'}}
                 visible={this.props.showQuantityModal} onBackdropPress={this.showhidequantityMOdal.bind(this,"")}

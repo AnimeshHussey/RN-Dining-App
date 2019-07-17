@@ -584,7 +584,7 @@ class TableScreen extends Component {
                       width: 100 + '%', flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'baseline',
                       alignContent: 'flex-start', alignSelf: 'flex-start', backgroundColor: defaultColor, height: 40,
                       borderWidth: 3, borderColor: '#fff'
-                    }} onPress={this.undoCheckout.bind(this,tableNo.TableID,tableNo.TableName,tableNo.OrderDetails.OrderID)}>
+                    }} onPress={this.undoCheckout.bind(this,tableNo.TableID,tableNo.TableName,tableNo.OrderDetails.OrderID?tableNo.OrderDetails.OrderID:"")}>
                       <View style={{ flex: 3, alignItems: 'center', justifyContent: 'center' }}>
                         <Text style={{ fontSize: this.getFontSize(25), color: '#fff' }}>Undo Checkout</Text>
                       </View>
@@ -711,12 +711,12 @@ class TableScreen extends Component {
                         <Icon1 name="remove" style={{ fontSize: this.getFontSize(30), color: '#fff' }}> </Icon1>
                       </View>
                     </TouchableOpacity>}
-                    {this.getBackgroundColor(tableNo.IsOccupied, tableNo.OrderDetails, tableNo.IsCheckedout, '') === 'green' &&
+                    {this.getBackgroundColor(tableNo.IsOccupied, tableNo.OrderDetails, tableNo.IsCheckedout, '') === 'green' && tableNo.OrderDetails &&
                     <TouchableOpacity style={{
                       width: 100 + '%', flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'baseline',
                       alignContent: 'flex-start', alignSelf: 'flex-start', backgroundColor: defaultColor, height: 40,
                       borderWidth: 3, borderColor: '#fff'
-                    }} onPress={this.undoCheckout.bind(this,tableNo.TableID,tableNo.TableName,tableNo.OrderDetails.OrderID)}>
+                    }} onPress={this.undoCheckout.bind(this,tableNo.TableID,tableNo.TableName,tableNo.OrderDetails.OrderID?tableNo.OrderDetails.OrderID:"")}>
                       <View style={{ flex: 3, alignItems: 'center', justifyContent: 'center' }}>
                         <Text style={{ fontSize: this.getFontSize(22), color: '#fff' }}>Undo Checkout</Text>
                       </View>
@@ -821,7 +821,7 @@ class TableScreen extends Component {
             </View>
           </View>
           {this.props.isUserModalVisible &&
-            <Modal backdropColor="black" backdropOpacity="0.4" transparent={true} style={{
+            <Modal backdropColor="black" transparent={true} style={{
               borderRadius: 5, opacity: 0.8,
               alignContent: 'center', alignSelf: 'center', alignContent: 'center'
             }} visible={this.props.isUserModalVisible}
@@ -843,7 +843,7 @@ class TableScreen extends Component {
         </View>
 
         {this.props.showMergeModal && 
-                <Modal backdropColor="black" backdropOpacity="0.4" transparent={true} 
+                <Modal backdropColor="black" transparent={true} 
                 style={{ borderRadius: 5, opacity: 0.8,
                 alignContent: 'center', alignSelf: 'center', alignContent: 'center'}}
                 visible={this.props.showMergeModal} onBackdropPress={this.showmergetableModalClick.bind(this)}

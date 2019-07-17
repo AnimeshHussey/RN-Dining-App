@@ -45,7 +45,7 @@ class MenuScreen extends Component {
       }
     }
   }
-  componentDidUpdate() {
+  componentDidUpdate(prevProps, prevState) {
     const resetAction = NavigationActions.reset({
       index: 0,
       key: null,
@@ -53,28 +53,48 @@ class MenuScreen extends Component {
           NavigationActions.navigate({ routeName: "TableStack" })
       ]
   });
-    if (this.props.isOrderPlaced==="SUCCESS") {   
+     if (this.props.isOrderPlaced==="SUCCESS") { 
+      this.props.itemList.forEach((element) => {
+        element.Items.forEach(item => {
+            item.quantity=0;
+        })
+    });  
       if(!__.isEmpty(this.props.childTables)){
-        let tables = [...this.props.childTables];
-        tables.push(this.props.selectedtable.TableID);
-        this.props.dispatch({ type: SagaActions.UNBLOCK_TABLES, TableIds:tables });
+        if(this.props.orderNumber){
+          this.props.dispatch({ type: SagaActions.UNBLOCK_TABLE, id:this.props.selectedtable.TableID });       
+        }
+        else{
+          let tables = [...this.props.childTables];
+          tables.push(this.props.selectedtable.TableID);
+          this.props.dispatch({ type: SagaActions.UNBLOCK_TABLES, TableIds:tables });
+        }
     }
     else{
         this.props.dispatch({ type: SagaActions.UNBLOCK_TABLE, id:this.props.selectedtable.TableID });
         }
     this.props.navigation.dispatch(resetAction);
     }
-    else if (this.props.isOrderPlaced==="FAILED"){
+    else if (prevProps.isOrderPlaced !==this.props.isOrderPlaced && this.props.isOrderPlaced==="FAILED"){
       Toast.show({
-        text: "Table's status has been changed.",
+        text: "Failed to place order for network issue.",
         textStyle: { fontSize: 25, fontFamily: 'Avenir-Black', fontWeight: 'bold' },
         duration: 2000,
         buttonTextStyle: { fontSize: 20, fontFamily: 'Avenir-Black' },
         buttonText: "Okay",
         type: "danger"
     });
-    this.props.navigation.dispatch(resetAction);
+    this.props.dispatch({type:ReduxActions.RESET_PLACING_ORDER});
     }
+    else if (prevProps.isOrderPlaced ==="FAILED" && this.props.isOrderPlaced==="FAILED"){
+      Toast.show({
+        text: "Failed to place order for network issue.",
+        textStyle: { fontSize: 25, fontFamily: 'Avenir-Black', fontWeight: 'bold' },
+        duration: 2000,
+        buttonTextStyle: { fontSize: 20, fontFamily: 'Avenir-Black' },
+        buttonText: "Okay",
+        type: "danger"
+    });
+  }
   }
  
   _onHideUnderlay() {
@@ -191,6 +211,12 @@ class MenuScreen extends Component {
     else {
       this.props.dispatch({ type: ReduxActions.RESET_SEARCH_DATA_MENU_REDUCER});
     }
+  }
+  componentDidCatch(error, info) {
+    // Display fallback UI
+    //this.setState({ hasError: true });
+    // You can also log the error to an error reporting service
+    alert("Detectd");
   }
 
   render() {
@@ -333,7 +359,7 @@ class MenuScreen extends Component {
                               <TouchableOpacity onPress={() => this.updateIndex(element, false, index)} style={{ padding: this.getFontSize(10) }}>
                                 <Icon name="minus-circle" size={this.getFontSize(35)} color={plusMinusIconColor} />
                               </TouchableOpacity>
-                              <Text style={{ marginVertical: 18, fontSize: this.getFontSize(20), color: defaultTxtColor }}>{element.quantity}</Text>
+                              <Text style={{ marginVertical: 18, fontSize: this.getFontSize(30),fontWeight:'bold',color: defaultTxtColor }}>{element.quantity}</Text>
                               <TouchableOpacity onPress={() => this.updateIndex(element, true, index)} style={{ padding: this.getFontSize(10) }}>
                                 <Icon name="plus-circle" size={this.getFontSize(35)} color={plusMinusIconColor} />
                               </TouchableOpacity>
@@ -375,7 +401,7 @@ class MenuScreen extends Component {
               </View>
               <View style={{ justifyContent: 'center', alignContent: 'center', alignSelf: 'center', alignContent: 'center' }}>
                 {this.props.isRemarksModalVisible &&
-                  <Modal backdropColor="black" backdropOpacity="0.4" transparent={true} style={{
+                  <Modal backdropColor="black"  transparent={true} style={{
                     borderRadius: this.getFontSize(5), opacity: 0.8,
                     alignContent: 'center', alignSelf: 'center', alignContent: 'center'
                   }}
@@ -389,7 +415,7 @@ class MenuScreen extends Component {
 
                   </Modal>}
                 {this.props.isOrderModalOpen &&
-                  <Modal backdropColor="black" backdropOpacity="0.4" transparent={true}
+                  <Modal backdropColor="black"  transparent={true}
                     style={{
                       borderRadius: this.getFontSize(5), opacity: 0.8,
                       alignContent: 'center', alignSelf: 'center', alignContent: 'center'
@@ -403,7 +429,7 @@ class MenuScreen extends Component {
                     <PlaceOrder navigation={this.props.navigation}></PlaceOrder>
                   </Modal>}
                 {this.props.isUserModalVisible &&
-                  <Modal backdropColor="black" backdropOpacity="0.4" transparent={true} style={{
+                  <Modal backdropColor="black" transparent={true} style={{
                     borderRadius: this.getFontSize(5), opacity: 0.8,
                     alignContent: 'center', alignSelf: 'center', alignContent: 'center'
                   }} visible={this.props.isUserModalVisible}

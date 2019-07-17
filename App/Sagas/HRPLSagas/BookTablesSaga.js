@@ -7,10 +7,15 @@ export const occupyTables = function * (action) {
     // make the call to the api
     const response = yield call(bookTables, tableIds);
     
-    if (response === "Successfully booked the table.") {
-      // do data conversion here if needed
-      yield put({type: ReduxActions.SUCCESSFULLY_BOOKED_TABLES, response });
-    } else {
+    try {
+      if (response === "Successfully booked the table.") {
+        // do data conversion here if needed
+        yield put({type: ReduxActions.SUCCESSFULLY_BOOKED_TABLES, response });
+      } else {
+        yield put({type: ReduxActions.FAILED_TO_BOOK_TABLES});
+      } 
+    } catch (error) {
       yield put({type: ReduxActions.FAILED_TO_BOOK_TABLES});
     }
+    
   }

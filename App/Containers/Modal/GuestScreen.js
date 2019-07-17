@@ -98,7 +98,7 @@ class GuestScreen extends Component {
                   <TextInput underlineColorAndroid='transparent' editable={!(this.props.isResOpen||(this.props.CustomerName!=="" && this.props.isButtonClicked))}
                     style={{ height: this.getFontSize(40), borderColor: 'black', borderWidth: 0.5, paddingBottom: 2,
                      paddingTop: 2, fontSize: this.getFontSize(25), backgroundColor: '#fff', color: 'black',
-                     opacity: 1  }} onChangeText={(text) => this.guestNameValidation(text)}
+                     opacity: 1  }} onChangeText={(text) => this.guestNameValidation(text)} 
                     value={this.props.isResOpen?this.props.bookingName: this.props.CustomerName}
                   />
                 </View>

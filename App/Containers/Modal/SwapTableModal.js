@@ -39,7 +39,8 @@ class SwapModal extends React.Component{
     }
 
   componentDidUpdate(prevProps, prevState) {
-    if(prevProps.TableStatus!==this.props.TableStatus && prevProps.TableStatus ==='' && this.props.TableStatus==="UNBLOCKED")
+    // if(prevProps.TableStatus!==this.props.TableStatus && prevProps.TableStatus ==='' && this.props.TableStatus==="UNBLOCKED")
+    if(this.props.TableStatus==="UNBLOCKED")
     { 
       this.proceedTableSelection();
     }
@@ -402,7 +403,8 @@ const mapStateToProps = (state) => {
         selectedSection:state.floorReducer.selectedSection,
         userID: state.DashBoardReducer.userID,
         selectedSection:state.floorReducer.selectedSection,
-        TableStatus:state.tableReducer.tableStatus
+        TableStatus:state.tableReducer.tableStatus,
+        swap: state.reviewReducer.swap,
     }
 }
 

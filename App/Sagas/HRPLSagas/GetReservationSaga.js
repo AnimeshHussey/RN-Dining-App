@@ -5,10 +5,14 @@ import ReduxActions from "../../Redux/ActionTypes/Action";
 export const getReservation = function * (action) {
   // make the call to the api
   const response = yield call(getAllReservations);
+ try {
   if (response) {
     // do data conversion here if needed
     yield put({type: ReduxActions.SAVE_ALL_RESERVATIONS, response });
   } else {
     yield put({type: ReduxActions.FAILED_TO_GET_RESERVATIONS});
   }
+ } catch (error) {
+  yield put({type: ReduxActions.FAILED_TO_GET_RESERVATIONS});
+ }
 }

@@ -36,43 +36,48 @@ class RegisterScreen extends Component{
         }
     }
     registerCaptain(){ 
-        if(this.props.captainDetails.MOBILENO.length === 10 && /^[0-9]{1,10}$/.test(this.props.captainDetails.MOBILENO)){
-            if(this.props.captainDetails.USERNAME.length>0 && /^[A-Za-z0-9 ]+$/.test(this.props.captainDetails.USERNAME)){
-                if(this.props.captainDetails.PASSWORD.length>=8){
-                    if(this.props.confPass===this.props.captainDetails.PASSWORD){
-                        let loginId=Object.assign({},this.props.captainDetails)
-                        loginId.PASSWORD=Base64.stringify(hmacSHA512(sha256(loginId.PASSWORD), "venom"));
-                        this.props.dispatch({type:SagaActions.CREATE_CAPTAIN, loginId});
-                        this.props.dispatch({type: ReduxActions.SET_REGISTER_PRESSED});
+        try{
+            if(this.props.captainDetails.MOBILENO.length === 10 && /^[0-9]{1,10}$/.test(this.props.captainDetails.MOBILENO)){
+                if(this.props.captainDetails.USERNAME.length>0 && /^[A-Za-z0-9 ]+$/.test(this.props.captainDetails.USERNAME)){
+                    if(this.props.captainDetails.PASSWORD.length>=8){
+                        if(this.props.confPass===this.props.captainDetails.PASSWORD){
+                            let loginId=Object.assign({},this.props.captainDetails)
+                            loginId.PASSWORD=Base64.stringify(hmacSHA512(sha256(loginId.PASSWORD), "venom"));
+                            this.props.dispatch({type:SagaActions.CREATE_CAPTAIN, loginId});
+                            this.props.dispatch({type: ReduxActions.SET_REGISTER_PRESSED});
+                        }else{
+                            Alert.alert('Invalid', 'Passwords do not match.',
+                            [{ text: 'Ok', onPress: ()=>{}, style: 'cancel' }],
+                            { cancelable: true });
+                            this.props.dispatch({type:ReduxActions.SET_COLOR_CONFPASS, isCorrect: false})}
                     }else{
-                        Alert.alert('Invalid', 'Passwords do not match.',
+                        Alert.alert('Invalid', 'Password should be at least 8 characters long.',
                         [{ text: 'Ok', onPress: ()=>{}, style: 'cancel' }],
                         { cancelable: true });
-                        this.props.dispatch({type:ReduxActions.SET_COLOR_CONFPASS, isCorrect: false})}
+                        this.props.dispatch({type:ReduxActions.SET_COLOR_PASS, isCorrect: false})}
                 }else{
-                    Alert.alert('Invalid', 'Password should be at least 8 characters long.',
+                    Alert.alert('Invalid', 'Please check the user name you entered.',
                     [{ text: 'Ok', onPress: ()=>{}, style: 'cancel' }],
                     { cancelable: true });
-                    this.props.dispatch({type:ReduxActions.SET_COLOR_PASS, isCorrect: false})}
+                    this.props.dispatch({type:ReduxActions.SET_COLOR_NAME, isCorrect: false})}
             }else{
-                Alert.alert('Invalid', 'Please check the user name you entered.',
+                Alert.alert('Invalid', 'Please check the mobile number you entered.',
                 [{ text: 'Ok', onPress: ()=>{}, style: 'cancel' }],
                 { cancelable: true });
-                this.props.dispatch({type:ReduxActions.SET_COLOR_NAME, isCorrect: false})}
-        }else{
-            Alert.alert('Invalid', 'Please check the mobile number you entered.',
-            [{ text: 'Ok', onPress: ()=>{}, style: 'cancel' }],
-            { cancelable: true });
-            this.props.dispatch({type:ReduxActions.SET_COLOR_ID, isCorrect: false})}
-            if(this.props.adminPassword === '' && this.props.userID==='')
-            {
-                let user = " ".concat('#', this.props.ip.concat(':', this.props.port));
-                this.setUIDPass(user," ");    
-            }
-            else{
-                let user = this.props.userID.concat('#', this.props.ip.concat(':', this.props.port));
-                this.setUIDPass(user,this.props.adminPassword); 
-            }    
+                this.props.dispatch({type:ReduxActions.SET_COLOR_ID, isCorrect: false})}
+                if(this.props.adminPassword === '' && this.props.userID==='')
+                {
+                    let user = " ".concat('#', this.props.ip.concat(':', this.props.port));
+                    this.setUIDPass(user," ");    
+                }
+                else{
+                    let user = this.props.userID.concat('#', this.props.ip.concat(':', this.props.port));
+                    this.setUIDPass(user,this.props.adminPassword); 
+                }    
+        }
+        catch(err){
+            this.props.dispatch({type:ReduxActions.FAILED_TO_REGISTER});
+        }
     }
     changePassword(input){
 

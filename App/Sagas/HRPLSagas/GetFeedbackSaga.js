@@ -7,11 +7,14 @@ export const GetFeedbackQuestions = function * (action) {
   // make the call to the api
   
   const response = yield call(getFeedbackQuestions);
-  if (response) {
-    
-    // do data conversion here if needed
-    yield put({type: ReduxActions.SET_FEEDBACK_QUESTIONS, response });
-  } else {
+  try {
+    if (response) {    
+      // do data conversion here if needed
+      yield put({type: ReduxActions.SET_FEEDBACK_QUESTIONS, response});
+    } else {
+      yield put({type: ReduxActions.ERROR_FEEDBACK_QUESTIONS});
+    }
+  } catch (error) {
     yield put({type: ReduxActions.ERROR_FEEDBACK_QUESTIONS});
   }
 }
